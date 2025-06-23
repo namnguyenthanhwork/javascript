@@ -203,8 +203,8 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const authObject = requestState.toAuth();
       logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
 
-      const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
-      const redirectToSignUp = createMiddlewareRedirectToSignUp(clerkRequest);
+      const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest, options);
+      const redirectToSignUp = createMiddlewareRedirectToSignUp(clerkRequest, options);
       const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
 
       const authHandler = createMiddlewareAuthHandler(requestState, redirectToSignIn, redirectToSignUp);
@@ -364,18 +364,20 @@ export const createAuthenticateRequestOptions = (
 
 const createMiddlewareRedirectToSignIn = (
   clerkRequest: ClerkRequest,
+  options: ClerkMiddlewareOptions,
 ): ClerkMiddlewareSessionAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
-    const url = clerkRequest.clerkUrl.toString();
+    const url = options.signInUrl || clerkRequest.clerkUrl.toString();
     redirectToSignInError(url, opts.returnBackUrl);
   };
 };
 
 const createMiddlewareRedirectToSignUp = (
   clerkRequest: ClerkRequest,
+  options: ClerkMiddlewareOptions,
 ): ClerkMiddlewareSessionAuthObject['redirectToSignUp'] => {
   return (opts = {}) => {
-    const url = clerkRequest.clerkUrl.toString();
+    const url = options.signUpUrl || clerkRequest.clerkUrl.toString();
     redirectToSignUpError(url, opts.returnBackUrl);
   };
 };
